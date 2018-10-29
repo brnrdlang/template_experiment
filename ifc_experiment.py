@@ -441,8 +441,6 @@ if __name__ == '__main__':
 
     btn = show_start(hrl, len(blockstorun['number']))
     print "start screen, pressed ", btn
-    if btn == 'Left':
-        break
                   
     # #Iterate across all blocks that need to be presented
     for i in range(len(blockstorun['number'])):
