@@ -180,7 +180,41 @@ def show_continue(hrl, b, nb):
     
     return btn
         
-
+def show_start(hrl, nb):
+    # Function from Thorsten
+    hrl.graphics.flip(clr=True)
+    if LANG=='de':
+        lines = [u'Du kannst jetzt eine Pause machen.',
+                 u' ',
+                 u'Du hast %d von %d blocks geschafft.' % (b, nb),
+                 u' ',
+                 u'Zum Weitermachen, druecke die rechte Taste,',
+                 u'zum Beenden druecke die linke Taste.'
+                 ]
+    elif LANG=='en':
+        lines = [u'This is the start of the experiment',
+                 u' ',
+                 u'The experiment consists of %d blocks.' % nb,
+                 u' ',
+                 u'To continue, press the right button,',
+                 u'to abort, press the left button.'
+                 ]
+    else:
+        raise('LANG not available')    
+        
+    for line_nr, line in enumerate(lines):
+        textline = hrl.graphics.newTexture(draw_text(line, fontsize=36))
+        textline.draw(((1024 - textline.wdth) / 2,
+                       (768 / 2 - (4 - line_nr) * (textline.hght + 10))))
+    hrl.graphics.flip(clr=True)
+    btn = None
+    while not (btn == 'Left' or btn == 'Right'):
+        (btn,t1) = hrl.inputs.readButton()
+    
+    # clean text    
+    graphics.deleteTextureDL(textline._dlid)    
+    
+    return btn
 
 def show_break(hrl,trial, total_trials):
     # Function from Thorsten
@@ -249,6 +283,9 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     transp = design['transp'][trl]
     pos = design['pos'][trl]
 
+    ann_r = ann/illum
+    ped_r = ped/illum
+
     print illum
     print ann
     print ped
@@ -259,11 +296,17 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     # stimuli
     if transp == '1':
       env = imgs['transp']
+
+      trp = np.mean(imgs[transp][imgs['disk'] > 0])
+
+      ann_r = (ann - trp)/illum
+      ped_r = (ped - trp)/illum
+
     else:
       env = imgs['env']
 
-    pedestal = illum * env + ann*imgs['annulus'] + ped * imgs['disk']
-    increment = illum * env + ann*imgs['annulus'] + (1 + incr) * ped * imgs['disk']
+    pedestal = illum * (env + ann_r*imgs['annulus'] + ped_r * imgs['disk'])
+    increment = illum * (env + ann_r*imgs['annulus'] + (1 + incr) * ped_r * imgs['disk'])
 
     # texture creation in buffer : stimulus
     ped_tex = hrl.graphics.newTexture(pedestal)
@@ -306,7 +349,7 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
         if btn != None:
                no_resp = False
     
-    rfl.write('%d\t%d\t%f\t%f\t%f\t%f\t%s\t%s\t%d\t%f\t%f\n' % (block, trl, illum, ann, ped, incr, transp, pos, response, t1, time.time()))
+    rfl.write('%d\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%s\t%s\t%d\t%f\t%f\n' % (block, trl, illum, ann, ped, ann_r, ped_r, incr, transp, pos, response, t1, time.time()))
     rfl.flush()
 
     # clean checkerboard texture from buffer
@@ -395,6 +438,11 @@ if __name__ == '__main__':
     #          fs=False)
 
     imgs = load_images()
+
+    btn = show_start(hrl, len(blockstorun['number']))
+    print "start screen, pressed ", btn
+    if btn == 'Left':
+        break
                   
     # #Iterate across all blocks that need to be presented
     for i in range(len(blockstorun['number'])):
@@ -416,7 +464,7 @@ if __name__ == '__main__':
         
 
         if start_trl == 0:
-            result_headers = ['block', 'trial', 'illum', 'ann', 'ped', 'incr', 'transp', 'pos', 'Response', 'resp.time', 'timestamp']
+            result_headers = ['block', 'trial', 'illum', 'ann', 'ped', 'ann_r', 'ped_r', 'incr', 'transp', 'pos', 'Response', 'resp.time', 'timestamp']
             rfl.write('\t'.join(result_headers)+'\n')
         
          
