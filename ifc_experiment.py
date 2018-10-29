@@ -417,7 +417,7 @@ if __name__ == '__main__':
         for trl in np.arange(start_trl, end_trl):
             #if trl>2:
             #    break
-            run_trial(hrl, trl,sess,  start_trl, end_trl) # function that executes the experiment
+            run_trial(hrl, trl,sess,  start_trl, end_trl, imgs) # function that executes the experiment
             
         # close result file for this block
         rfl.close()
