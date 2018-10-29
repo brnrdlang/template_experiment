@@ -217,7 +217,7 @@ def show_break(hrl,trial, total_trials):
     graphics.deleteTextureDL(textline._dlid)    
 
 
-def run_trial(hrl,trl, block,start_trl, end_trl):
+def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     
     whlf = WIDTH/2.0
     hhlf = HEIGHT/2.0
@@ -242,40 +242,47 @@ def run_trial(hrl,trl, block,start_trl, end_trl):
     
     # current trial design variables
     thistrial = int(design['Trial'][trl])
-    tau1 = float(design['tau1'][trl])
-    tau2 = float(design['tau2'][trl])
-    alpha1 = float(design['alpha1'][trl])
-    alpha2 = float(design['alpha2'][trl])
-    
-    print tau1
-    print alpha1
-    print tau2
-    print alpha2
+    illum = float(design['illum'][trl])
+    ann = float(design['ann'][trl])
+    ped = float(design['ped'][trl])
+    incr = float(design['incr'][trl])
+    transp = design['transp'][trl]
+    pos = design['pos'][trl]
+
+    print illum
+    print ann
+    print ped
+    print incr
+    print transp
+    print pos
     
     # stimuli
-    trialname1 = '%d_a_%.2f_tau_%.2f' % (thistrial, alpha1, tau1)
-    stim_name1 = 'stimuli/%s/block_%d_%s_cropped' % (vp_id, block, trialname1)
-        
-    trialname2 = '%d_a_%.2f_tau_%.2f' % (thistrial, alpha2, tau2)
-    stim_name2 = 'stimuli/%s/block_%d_%s_cropped' % (vp_id, block, trialname2)
-    
+    if transp == '1':
+      env = imgs['transp']
+    else:
+      env = imgs['env']
 
-    #print stim_name
-    
-    # load stimlus image and convert from png to numpy array 
-    curr_image1 = image_to_array(stim_name1)
-    curr_image2 = image_to_array(stim_name2)
+    pedestal = illum * (env + ann*imgs['annulus'] + ped * imgs['disk'])
+    increment = illum * (env + ann*imgs['annulus'] + (1 + incr) * ped * imgs['disk'])
 
     # texture creation in buffer : stimulus
-    checkerboard1 = hrl.graphics.newTexture(curr_image1)
-    checkerboard2 = hrl.graphics.newTexture(curr_image2)
+    ped_tex = hrl.graphics.newTexture(pedestal)
+    incr_tex = hrl.graphics.newTexture(increment)
 
     
-    # Show stimlus 
+    # Show stimulus 
     # draw the checkerboard s
-    checkerboard1.draw((0, hhlf - checkerboard1.hght/2))
-    checkerboard2.draw((whlf, hhlf - checkerboard1.hght/2))
-         
+    if pos == '1':
+      ped_tex.draw()
+      hrl.graphics.flip(clr=False)
+      time.sleep(0.5)
+      incr_tex.draw()
+    else:
+      ped_tex.draw()
+      hrl.graphics.flip(clr=False)
+      time.sleep(0.5)
+      incr_tex.draw()
+
     # flip everything
     hrl.graphics.flip(clr=False)   # clr= True to clear buffer
     
@@ -287,20 +294,28 @@ def run_trial(hrl,trl, block,start_trl, end_trl):
         if btn != None:
                no_resp = False
     
-    rfl.write('%d\t%d\t%f\t%f\t%f\t%f\t%d\t%f\t%f\n' % (block, trl, alpha1, alpha2, tau1, tau2, response, t1, time.time()))
+    rfl.write('%d\t%d\t%f\t%f\t%f\t%f\t%s\t%s\t%d\t%f\t%f\n' % (block, trl, illum, ann, ped, incr, transp, pos, response, t1, time.time()))
     rfl.flush()
 
     # clean checkerboard texture from buffer
     # (needed! Specially if hundreds of trials are presented, if not 
     # cleared they accummulate in buffer)
-    graphics.deleteTextureDL(checkerboard1._dlid)
-    graphics.deleteTextureDL(checkerboard2._dlid)
+    graphics.deleteTextureDL(incr_tex._dlid)
+    graphics.deleteTextureDL(ped_tex._dlid)
 
     
     return response
     
+def load_images():
+    env = np.load('stimuli/env.npy')
+    transp = np.load('stimuli/transp.npy')
+    disk = np.load('stimuli/disk.npy')
+    ann = np.load('stimuli/annulus.npy')
 
-
+    return {'env'    : env,
+            'transp' : transp,
+            'disk'   : disk,
+            'annulus': ann}
 
 ### Run Main ###
 if __name__ == '__main__':
@@ -366,6 +381,8 @@ if __name__ == '__main__':
     #          lut=lut,
     #          db = True,
     #          fs=False)
+
+    imgs = load_textures()
                   
     # #Iterate across all blocks that need to be presented
     for i in range(len(blockstorun['number'])):
@@ -387,7 +404,7 @@ if __name__ == '__main__':
         
 
         if start_trl == 0:
-            result_headers = ['block', 'trial', 'alpha1', 'alpha2', 'tau1', 'tau2', 'Response', 'resp.time', 'timestamp']
+            result_headers = ['block', 'trial', 'illum', 'ann', 'ped', 'incr', 'transp', 'pos', 'Response', 'resp.time', 'timestamp']
             rfl.write('\t'.join(result_headers)+'\n')
         
          
