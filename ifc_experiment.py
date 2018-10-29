@@ -300,8 +300,8 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
 
       trp = np.mean(imgs['transp'][imgs['disk'] > 0])
 
-      ann_r = (ann - trp)/illum
-      ped_r = (ped - trp)/illum
+      ann_r = ann_r - trp
+      ped_r = ped_r - trp
 
     else:
       env = imgs['env']
