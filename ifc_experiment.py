@@ -274,11 +274,11 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     # draw the checkerboard s
     if pos == '1':
       ped_tex.draw((0,0))
-      hrl.graphics.flip(clr=False)
+      hrl.graphics.flip(clr=False)   # clr= True to clear buffer
       time.sleep(0.5)
 
       hrl.graphics.flip()
-      time.sleep(0.25)
+      time.sleep(0.5)
 
       incr_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
@@ -289,14 +289,14 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
       time.sleep(0.5)
 
       hrl.graphics.flip()
-      time.sleep(0.25)
+      time.sleep(0.5)
 
       incr_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
 
     # flip everything
-    hrl.graphics.flip(clr=False)   # clr= True to clear buffer
+    hrl.graphics.flip()
     
     # loop for waiting a response
     no_resp = True 
