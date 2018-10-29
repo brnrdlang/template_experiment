@@ -386,7 +386,7 @@ if __name__ == '__main__':
     #          db = True,
     #          fs=False)
 
-    imgs = load_textures()
+    imgs = load_images()
                   
     # #Iterate across all blocks that need to be presented
     for i in range(len(blockstorun['number'])):
