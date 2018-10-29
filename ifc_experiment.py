@@ -262,8 +262,8 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     else:
       env = imgs['env']
 
-    pedestal = illum * (env + ann*imgs['annulus'] + ped * imgs['disk'])
-    increment = illum * (env + ann*imgs['annulus'] + (1 + incr) * ped * imgs['disk'])
+    pedestal = illum * env + ann*imgs['annulus'] + ped * imgs['disk']
+    increment = illum * env + ann*imgs['annulus'] + (1 + incr) * ped * imgs['disk']
 
     # texture creation in buffer : stimulus
     ped_tex = hrl.graphics.newTexture(pedestal)
@@ -277,11 +277,15 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
       incr_tex.draw()
+      hrl.graphics.flip(clr=False)
+      time.sleep(0.5)
     else:
       ped_tex.draw()
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
       incr_tex.draw()
+      hrl.graphics.flip(clr=False)
+      time.sleep(0.5)
 
     # flip everything
     hrl.graphics.flip(clr=False)   # clr= True to clear buffer
