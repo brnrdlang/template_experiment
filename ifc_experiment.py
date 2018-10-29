@@ -114,7 +114,8 @@ def get_last_trial(vp_id,sess):
     except IOError:
         print 'result file not found'
         return 0
-        
+    
+    last_trl = 0
     for line in rfl:
         try:
             last_trl = int(line.split('\t')[1])
@@ -297,7 +298,7 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     if transp == '1':
       env = imgs['transp']
 
-      trp = np.mean(imgs[transp][imgs['disk'] > 0])
+      trp = np.mean(imgs['transp'][imgs['disk'] > 0])
 
       ann_r = (ann - trp)/illum
       ped_r = (ped - trp)/illum
