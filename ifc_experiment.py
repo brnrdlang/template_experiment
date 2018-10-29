@@ -273,17 +273,25 @@ def run_trial(hrl,trl, block,start_trl, end_trl, imgs):
     # Show stimulus 
     # draw the checkerboard s
     if pos == '1':
-      ped_tex.draw()
+      ped_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
-      incr_tex.draw()
+
+      hrl.graphics.flip()
+      time.sleep(0.25)
+
+      incr_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
     else:
-      ped_tex.draw()
+      ped_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
-      incr_tex.draw()
+
+      hrl.graphics.flip()
+      time.sleep(0.25)
+
+      incr_tex.draw((0,0))
       hrl.graphics.flip(clr=False)
       time.sleep(0.5)
 
